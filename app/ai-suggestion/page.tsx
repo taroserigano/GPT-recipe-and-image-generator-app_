@@ -5,14 +5,13 @@
 // Purpose: ChatGPT will generate the recipe for the selected food menu 
 // Options: language, word limit, 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { generateChatResponse } from '@/utils/actions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 
 const AiSuggestion = () => {
-
   // grab the search params 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -134,4 +133,12 @@ const AiSuggestion = () => {
   );
 };
 
-export default AiSuggestion;
+// export default AiSuggestion;
+
+export default function AiSuggestionPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AiSuggestion />
+    </Suspense>
+  );
+}

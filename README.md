@@ -76,13 +76,24 @@ Deploy the application using your preferred deployment service. Here's how to de
     ```
 
 ## 📸 Screenshots
+*Beautiful and Ultimate Recipe Maker with which you can save, edit and delete!*
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/1.jpg)
 
-![Homepage](public/screenshots/homepage.png)
-*Caption: Beautiful and intuitive homepage*
 
-![Recipe Page](public/screenshots/recipe-page.png)
-*Caption: Detailed recipe page with cooking instructions*
+*You can save the title and memo!*
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/2.jpg)
 
+*You can update, too! *
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/3.jpg)
+
+*Search through the food menu from a huge Spooncular database!*
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/4.jpg)
+
+* Once you pick the menu, let AI spit out the recipe! Mind you, you can also set the words limit and language of your choice!*
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/5.jpg)
+
+  *The ChatGPT will generate the image of your choice! You can also save the image and edit title!*
+![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/2.jpg)
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.

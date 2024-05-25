@@ -1,4 +1,3 @@
-Here's the formatted `README.md` for your GitHub repository:
 
 ---
 
@@ -83,28 +82,18 @@ Deploy the application using your preferred deployment service. Here's how to de
 *You can save the title and memo!*
 ![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/2.jpg)
 
-*You can update, too! *
+*You can update, too!*
 ![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/3.jpg)
 
-*Search through the food menu from a huge Spooncular database!*
+*Search through food menus from the huge database by Spooncular!*
 ![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/4.jpg)
 
-* Once you pick the menu, let AI spit out the recipe! Mind you, you can also set the words limit and language of your choice!*
+Once you pick the menu, let AI spit out the recipe! Mind you, you can also set the words limit and language of your choice!*
 ![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/5.jpg)
 
   *The ChatGPT will generate the image of your choice! You can also save the image and edit title!*
 ![Preview](https://github.com/taroserigano/GPT-recipe-and-image-generator-app_/blob/main/img/2.jpg)
-## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 📧 Contact
-
-For any inquiries, please contact me at [your-email@example.com](mailto:your-email@example.com).
 
 ---
 

@@ -1,113 +1,240 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState, ChangeEvent, KeyboardEvent, useRef, useCallback} from 'react';
+import axios from 'axios';
+import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import dynamic from 'next/dynamic';
+import dotenv from 'dotenv';
+
+const RecipeList = dynamic(() => import('./components/RecipeList'), { ssr: false });
 
 export default function Home() {
+
+  
+  // interface for recipe search data 
+  interface Data {
+    id: number;
+    content: string;
+    recipe: string;
+  }
+
+  let ref = useRef<HTMLInputElement>(null);
+
+  const [query, setQuery] = useState('');
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // load up the inital data from localStorage 
+  const [data, setData] = useState<Data[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saveddata = localStorage.getItem('data');
+      return saveddata
+        ? JSON.parse(saveddata)
+        : [
+            { id: 1, content: 'Pizza 🍕', recipe: '' },
+            { id: 2, content: 'Pasta 🍝', recipe: '' },
+          ];
+    }
+    return [
+      { id: 1, content: 'Pizza 🍕', recipe: '' },
+      { id: 2, content: 'Pasta 🍝', recipe: '' },
+    ];
+  });
+
+  const [newData, setNewData] = useState<string>('');
+  const [newRecipe, setNewRecipe] = useState<string>('');
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState<string>('');
+  const [editRecipe, setEditRecipe] = useState<string>('');
+  
+  // load up the data from localStorage at inital rendering 
+  useEffect(() => {
+    localStorage.setItem('data', JSON.stringify(data));
+  }, [data]);
+
+  // focus on input at initial loading 
+  useEffect(() => {
+    if (ref.current) ref.current.focus();
+  }, []);
+
+  // add debounce feature
+  // search will be triggered only after the wait time 
+  const debounce = (func: Function, wait: number) => {
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    return useCallback((...args: any[]) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        func(...args);
+      }, wait);
+    }, [func, wait]);
+  };
+
+  // search recipe from the API 
+  const searchRecipes = async () => {
+    try {
+      setError(null);
+      const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch`, {
+        params: {
+          apiKey: process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY,
+          query: query,
+        },
+      });
+      setRecipes(response.data.results);
+      console.log("CHECKING")
+      toast.error("You are WILD❤️‍🔥🔥!!!", { autoClose: 777 });
+    } catch (error) {
+      setError('Error fetching recipes');
+    }
+  }
+
+  // implement debounce feature with the searchRecipes 
+  const debouncedSearchRecipes = debounce(searchRecipes, 777);
+
+  // baic CRUD operations below
+  const addData = (newData: string, newRecipe: string) => { 
+    if (!newData.trim()) {
+      toast.error("Recipe data cannot be empty", { autoClose: 500 });
+      return;
+    }
+    newData = newData[0].toUpperCase() + newData.slice(1);
+    setData([...data, { id: Date.now(), content: newData, recipe: newRecipe }]);
+    setNewData('');
+    setNewRecipe('');
+    toast.success("Recipe added!", { autoClose: 500 });
+  };
+
+  const startEditData = (id: number) => {
+    const Data = data.find((t) => t.id === id);
+    if (Data) {
+      setEditId(id);
+      setEditContent(Data.content);
+      setEditRecipe(Data.recipe);
+    }
+  };
+
+  const updateData = () => {
+    if (editId !== null && editContent.trim()) {
+      setData(
+        data.map((Data) =>
+          Data.id === editId ? { ...Data, content: editContent, recipe: editRecipe } : Data
+        )
+      );
+      setEditId(null);
+      setEditContent('');
+      setEditRecipe('');
+      toast.info("Recipe updated!", { autoClose: 500 });
+    }
+  };
+
+  const deleteData = (id: number) => {
+    setData(data.filter((Data) => Data.id !== id));
+    toast.warning("Recipe deleted!", { autoClose: 500 });
+  };
+
+  // support function for key press down 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      addData(newData, newRecipe);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <div className="container mx-auto p-4 dark:bg-gray-900 dark:text-white">
+      <ToastContainer />
+      <h1 className="text-3xl font-bold mb-6 text-center">Taro's <span className="text-green-500">W<span className="text-green-500"></span>ild</span>💙 Recipe Generator</h1>
+      <div className="mb-4">
+        <input
+          type="text"
+          value={newData}
+          onChange={(e) => setNewData(e.target.value)}
+          placeholder="Add new Menu"
+          ref={ref}
+          onKeyDown={handleKeyDown}
+          className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
         />
+        <input
+          type="text"
+          value={newRecipe}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => setNewRecipe(e.target.value)}
+          placeholder="Add recipe for the Menu"
+          className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
+        />
+        <button
+          onClick={() => addData(newData, newRecipe)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+        >
+          Add
+        </button>
       </div>
+      {editId !== null && (
+        <div className="mb-4">
+          <input
+            type="text"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            placeholder="Edit Data"
+            className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
+          />
+          <textarea
+            rows={3}        
+            value={editRecipe}
+            onChange={(e) => setEditRecipe(e.target.value)}
+            placeholder="Edit recipe for Data"
+            className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
+          />
+          <button
+            onClick={updateData}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+          >
+            Update
+          </button>
+        </div>
+      )}
+      <RecipeList data={data} editData={startEditData} deleteData={deleteData} />
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="mb-6 mt-10">  
+      <h2>Browse Recipe</h2>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={debouncedSearchRecipes}
+          className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
+          placeholder="Search recipe menu"
+        />
+        <button
+          onClick={searchRecipes}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
         >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+          Search
+        </button>
       </div>
-    </main>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {recipes.map((recipe) => (
+          <div key={recipe.id} className="bg-white dark:bg-gray-800 shadow-md rounded p-4">
+            <h2 className="text-xl font-bold mb-2">{recipe.title}</h2>
+            <Link
+              href={`/ai-suggestion?recipe=${recipe.title}`}
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 mb-2"
+            >
+              Get AI Suggestions
+            </Link>
+            <button
+              onClick={() => addData(recipe.title, '')}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+            >
+              SAVE
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

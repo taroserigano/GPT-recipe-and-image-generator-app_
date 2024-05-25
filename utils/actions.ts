@@ -22,7 +22,7 @@ export const generateChatResponse = async (chatMessages:string, limit:number, la
           { role: 'system', content: 'you are a helpful assistant' },
           // ...chatMessages,
           {role: 'user', content: `How can you cook ${chatMessages} ? Tell me in around  
-          ${limitWords} words in ${lang}. `}
+          ${limitWords} words in ${lang} language. `}
         ],
         model: 'gpt-4o',
         // temperature: 0, - for randomize value 

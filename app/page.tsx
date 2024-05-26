@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, ChangeEvent, KeyboardEvent, useRef, useCallback} from 'react';
+import { useEffect, useState, ChangeEvent, KeyboardEvent, useRef, useCallback } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
@@ -11,9 +11,7 @@ import dotenv from 'dotenv';
 const RecipeList = dynamic(() => import('./components/RecipeList'), { ssr: false });
 
 export default function Home() {
-
-  
-  // interface for recipe search data 
+  // Interface for recipe search data
   interface Data {
     id: number;
     content: string;
@@ -26,12 +24,12 @@ export default function Home() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // load up the inital data from localStorage 
+  // Load up the initial data from localStorage
   const [data, setData] = useState<Data[]>(() => {
     if (typeof window !== 'undefined') {
-      const saveddata = localStorage.getItem('data');
-      return saveddata
-        ? JSON.parse(saveddata)
+      const savedData = localStorage.getItem('data');
+      return savedData
+        ? JSON.parse(savedData)
         : [
             { id: 1, content: 'Pizza 🍕', recipe: '' },
             { id: 2, content: 'Pasta 🍝', recipe: '' },
@@ -48,33 +46,36 @@ export default function Home() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>('');
   const [editRecipe, setEditRecipe] = useState<string>('');
-  
-  // load up the data from localStorage at inital rendering 
+
+  // Load up the data from localStorage at initial rendering
   useEffect(() => {
     localStorage.setItem('data', JSON.stringify(data));
   }, [data]);
 
-  // focus on input at initial loading 
+  // Focus on input at initial loading
   useEffect(() => {
     if (ref.current) ref.current.focus();
   }, []);
 
-  // add debounce feature
-  // search will be triggered only after the wait time 
+  // Add debounce feature
+  // Search will be triggered only after the wait time
   const debounce = (func: Function, wait: number) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    return useCallback((...args: any[]) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        func(...args);
-      }, wait);
-    }, [func, wait]);
+    return useCallback(
+      (...args: any[]) => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+          func(...args);
+        }, wait);
+      },
+      [func, wait]
+    );
   };
 
-  // search recipe from the API 
+  // Search recipe from the API
   const searchRecipes = async () => {
     try {
       setError(null);
@@ -85,18 +86,18 @@ export default function Home() {
         },
       });
       setRecipes(response.data.results);
-      console.log("CHECKING")
-      toast.error("You are WILD❤️‍🔥🔥!!!", { autoClose: 777 });
+      toast.success("Recipes fetched successfully!", { autoClose: 777 });
     } catch (error) {
       setError('Error fetching recipes');
+      toast.error("Error fetching recipes", { autoClose: 777 });
     }
-  }
+  };
 
-  // implement debounce feature with the searchRecipes 
+  // Implement debounce feature with the searchRecipes
   const debouncedSearchRecipes = debounce(searchRecipes, 777);
 
-  // baic CRUD operations below
-  const addData = (newData: string, newRecipe: string) => { 
+  // Basic CRUD operations below
+  const addData = (newData: string, newRecipe: string) => {
     if (!newData.trim()) {
       toast.error("Recipe data cannot be empty", { autoClose: 500 });
       return;
@@ -136,7 +137,7 @@ export default function Home() {
     toast.warning("Recipe deleted!", { autoClose: 500 });
   };
 
-  // support function for key press down 
+  // Support function for key press down
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       addData(newData, newRecipe);
@@ -167,7 +168,7 @@ export default function Home() {
         />
         <button
           onClick={() => addData(newData, newRecipe)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 w-full sm:w-auto"
         >
           Add
         </button>
@@ -190,7 +191,7 @@ export default function Home() {
           />
           <button
             onClick={updateData}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 w-full sm:w-auto"
           >
             Update
           </button>
@@ -199,7 +200,7 @@ export default function Home() {
       <RecipeList data={data} editData={startEditData} deleteData={deleteData} />
 
       <div className="mb-6 mt-10">  
-      <h2>Browse Recipe</h2>
+        <h2 className="text-2xl font-bold mb-4">Browse Recipe</h2>
         <input
           type="text"
           value={query}
@@ -210,7 +211,7 @@ export default function Home() {
         />
         <button
           onClick={searchRecipes}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 w-full sm:w-auto"
         >
           Search
         </button>
@@ -222,13 +223,13 @@ export default function Home() {
             <h2 className="text-xl font-bold mb-2">{recipe.title}</h2>
             <Link
               href={`/ai-suggestion?recipe=${recipe.title}`}
-              className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 mb-2"
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 mb-2 w-full text-center"
             >
               Get AI Suggestions
             </Link>
             <button
               onClick={() => addData(recipe.title, '')}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 w-full sm:w-auto"
             >
               SAVE
             </button>

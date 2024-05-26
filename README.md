@@ -101,4 +101,3 @@ Enjoy cooking with the **Food Cooking Recipe Maker**! 🍳👨‍🍳👩‍🍳
 
 ---
 
-Feel free to copy and paste this into your `README.md` file and adjust any details as needed!

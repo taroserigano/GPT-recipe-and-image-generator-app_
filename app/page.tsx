@@ -1,14 +1,23 @@
 "use client";
-import { useEffect, useState, ChangeEvent, KeyboardEvent, useRef, useCallback } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  useEffect,
+  useState,
+  ChangeEvent,
+  KeyboardEvent,
+  useRef,
+  useCallback,
+} from "react";
+import axios from "axios";
+import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import dynamic from 'next/dynamic';
-import dotenv from 'dotenv';
+import dynamic from "next/dynamic";
+import dotenv from "dotenv";
 
-const RecipeList = dynamic(() => import('./components/RecipeList'), { ssr: false });
+const RecipeList = dynamic(() => import("./components/RecipeList"), {
+  ssr: false,
+});
 
 export default function Home() {
   // Interface for recipe search data
@@ -20,37 +29,37 @@ export default function Home() {
 
   let ref = useRef<HTMLInputElement>(null);
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [recipes, setRecipes] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Load up the initial data from localStorage
   const [data, setData] = useState<Data[]>(() => {
-    // check if the code is running on the browser environment 
-    if (typeof window !== 'undefined') {
-      const savedData = localStorage.getItem('data');
+    // check if the code is running on the browser environment
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("data");
       return savedData
         ? JSON.parse(savedData)
         : [
-            { id: 1, content: 'Pizza 🍕', recipe: '' },
-            { id: 2, content: 'Pasta 🍝', recipe: '' },
+            { id: 1, content: "Pizza 🍕", recipe: "" },
+            { id: 2, content: "Pasta 🍝", recipe: "" },
           ];
     }
     return [
-      { id: 1, content: 'Pizza 🍕', recipe: '' },
-      { id: 2, content: 'Pasta 🍝', recipe: '' },
+      { id: 1, content: "Pizza 🍕", recipe: "" },
+      { id: 2, content: "Pasta 🍝", recipe: "" },
     ];
   });
 
-  const [newData, setNewData] = useState<string>('');
-  const [newRecipe, setNewRecipe] = useState<string>('');
+  const [newData, setNewData] = useState<string>("");
+  const [newRecipe, setNewRecipe] = useState<string>("");
   const [editId, setEditId] = useState<number | null>(null);
-  const [editContent, setEditContent] = useState<string>('');
-  const [editRecipe, setEditRecipe] = useState<string>('');
+  const [editContent, setEditContent] = useState<string>("");
+  const [editRecipe, setEditRecipe] = useState<string>("");
 
   // Load up the data from localStorage at initial rendering
   useEffect(() => {
-    localStorage.setItem('data', JSON.stringify(data));
+    localStorage.setItem("data", JSON.stringify(data));
   }, [data]);
 
   // Focus on input at initial loading
@@ -80,16 +89,19 @@ export default function Home() {
   const searchRecipes = async () => {
     try {
       setError(null);
-      const response = await axios.get(`https://api.spoonacular.com/recipes/complexSearch`, {
-        params: {
-          apiKey: process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY,
-          query: query,
-        },
-      });
+      const response = await axios.get(
+        `https://api.spoonacular.com/recipes/complexSearch`,
+        {
+          params: {
+            apiKey: process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY,
+            query: query,
+          },
+        }
+      );
       setRecipes(response.data.results);
       toast.success("Recipes fetched successfully!", { autoClose: 777 });
     } catch (error) {
-      setError('Error fetching recipes');
+      setError("Error fetching recipes");
       toast.error("Error fetching recipes", { autoClose: 777 });
     }
   };
@@ -99,14 +111,15 @@ export default function Home() {
 
   // Basic CRUD operations below
   const addData = (newData: string, newRecipe: string) => {
+    // if newData is empty,
     if (!newData.trim()) {
       toast.error("Recipe data cannot be empty", { autoClose: 500 });
       return;
     }
     newData = newData[0].toUpperCase() + newData.slice(1);
     setData([...data, { id: Date.now(), content: newData, recipe: newRecipe }]);
-    setNewData('');
-    setNewRecipe('');
+    setNewData("");
+    setNewRecipe("");
     toast.success("Recipe added!", { autoClose: 500 });
   };
 
@@ -123,12 +136,14 @@ export default function Home() {
     if (editId !== null && editContent.trim()) {
       setData(
         data.map((Data) =>
-          Data.id === editId ? { ...Data, content: editContent, recipe: editRecipe } : Data
+          Data.id === editId
+            ? { ...Data, content: editContent, recipe: editRecipe }
+            : Data
         )
       );
       setEditId(null);
-      setEditContent('');
-      setEditRecipe('');
+      setEditContent("");
+      setEditRecipe("");
       toast.info("Recipe updated!", { autoClose: 500 });
     }
   };
@@ -140,7 +155,7 @@ export default function Home() {
 
   // Support function for key press down
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       addData(newData, newRecipe);
     }
   };
@@ -148,7 +163,13 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4 dark:bg-gray-900 dark:text-white">
       <ToastContainer />
-      <h1 className="text-3xl font-bold mb-6 text-center">Taro's <span className="text-green-500">W<span className="text-green-500"></span>ild</span>💙 Recipe Generator</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Taro's{" "}
+        <span className="text-green-500">
+          W<span className="text-green-500"></span>ild
+        </span>
+        💙 Recipe Generator
+      </h1>
       <div className="mb-4">
         <input
           type="text"
@@ -184,7 +205,7 @@ export default function Home() {
             className="border p-2 rounded w-full mb-2 bg-gray-50 dark:bg-gray-700 dark:text-white"
           />
           <textarea
-            rows={3}        
+            rows={3}
             value={editRecipe}
             onChange={(e) => setEditRecipe(e.target.value)}
             placeholder="Edit recipe for Data"
@@ -198,9 +219,13 @@ export default function Home() {
           </button>
         </div>
       )}
-      <RecipeList data={data} editData={startEditData} deleteData={deleteData} />
+      <RecipeList
+        data={data}
+        editData={startEditData}
+        deleteData={deleteData}
+      />
 
-      <div className="mb-6 mt-10">  
+      <div className="mb-6 mt-10">
         <h2 className="text-2xl font-bold mb-4">Browse Recipe</h2>
         <input
           type="text"
@@ -220,7 +245,10 @@ export default function Home() {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {recipes.map((recipe) => (
-          <div key={recipe.id} className="bg-white dark:bg-gray-800 shadow-md rounded p-4">
+          <div
+            key={recipe.id}
+            className="bg-white dark:bg-gray-800 shadow-md rounded p-4"
+          >
             <h2 className="text-xl font-bold mb-2">{recipe.title}</h2>
             <Link
               href={`/ai-suggestion?recipe=${recipe.title}`}
@@ -229,7 +257,7 @@ export default function Home() {
               Get AI Suggestions
             </Link>
             <button
-              onClick={() => addData(recipe.title, '')}
+              onClick={() => addData(recipe.title, "")}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 w-full sm:w-auto"
             >
               SAVE

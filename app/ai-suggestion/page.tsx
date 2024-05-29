@@ -53,13 +53,19 @@ const AiSuggestion = () => {
     }
   }, [recipe, suggestions]);
 
+  interface Data {
+    id: number;
+    content: string;
+    recipe: string;
+  }
+
   // save the generated recipe, add to the selected food
   const saveRecipe = () => {
     if (typeof window !== "undefined") {
       // load up from local storage
       const recipeData = JSON.parse(localStorage.getItem("data") || "[]");
       // find the corresponding menu and add that recipe to the menu
-      const updatedrecipeData = recipeData.map((recipeData: any) =>
+      const updatedrecipeData = recipeData.map((recipeData: Data) =>
         recipeData.content === recipe
           ? { ...recipeData, recipe: data }
           : recipeData
@@ -144,6 +150,7 @@ const AiSuggestion = () => {
 
 export default function AiSuggestionPage() {
   return (
+    // while the asynchrous fetching, show the loading message
     <Suspense fallback={<div>Loading...</div>}>
       <AiSuggestion />
     </Suspense>

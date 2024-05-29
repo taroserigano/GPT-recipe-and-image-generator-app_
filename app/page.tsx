@@ -123,6 +123,7 @@ export default function Home() {
     toast.success("Recipe added!", { autoClose: 500 });
   };
 
+  // trigger the editing mode 
   const startEditData = (id: number) => {
     const Data = data.find((t) => t.id === id);
     if (Data) {
@@ -132,7 +133,9 @@ export default function Home() {
     }
   };
 
+  
   const updateData = () => {
+    // if editId is valid and editContent is not empty 
     if (editId !== null && editContent.trim()) {
       setData(
         data.map((Data) =>
@@ -141,6 +144,7 @@ export default function Home() {
             : Data
         )
       );
+      // clean up for editing inputs 
       setEditId(null);
       setEditContent("");
       setEditRecipe("");

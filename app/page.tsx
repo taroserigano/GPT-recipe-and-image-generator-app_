@@ -26,6 +26,7 @@ export default function Home() {
 
   // Load up the initial data from localStorage
   const [data, setData] = useState<Data[]>(() => {
+    // check if the code is running on the browser environment 
     if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('data');
       return savedData
